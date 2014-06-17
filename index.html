@@ -1,0 +1,64 @@
+<!doctype html>
+<html>
+<head>
+	<title></title>
+	<script type="text/javascript" src="underscore-min.js"></script>
+	<script type="text/javascript" src="angular.min.js"></script>
+</head>
+<body ng-app="testApp">
+
+	<div ng-cloak ng-controller="Whatever">
+		<input type='text' ng-model="title" ng-change="filter()">
+		<button ng-click="filter()">Filter</button>
+		<span ng-repeat="p in posts">
+			<h4>{{ p.title }}</h4>
+			<div>{{ p.date }}</div>
+		</span>
+
+	</div>
+
+<script type="text/javascript">
+var testApp = angular.module("testApp", []);
+
+function BlogPost(opts) {
+	opts = opts || {};
+	this.title = opts.title || "Sample Post";
+	this.date = opts.date || new Date();
+	return this;
+}
+
+function Whatever($scope) {
+	$scope._posts = [
+		new BlogPost({date: new Date(2012, 1, 1), title: "Whatever"}),
+		new BlogPost({date: new Date(2014, 2, 4), title: "Hell yeah"}),
+		new BlogPost({date: new Date(1997, 5, 25), title: "Post Number One"}),
+		new BlogPost({date: new Date(2000, 5, 1), title: "Gung Ho!"}),
+		new BlogPost({date: new Date(1981, 5, 20)})
+	];
+	$scope.posts = [];//$scope._posts.slice();
+	$scope.title = "";
+
+	$scope.filter = function () {
+		var posts = $scope._posts.slice();
+
+		if ($scope.title) {
+			var q = $scope.title.toLowerCase();
+			posts = _.filter(posts, function (post) {
+				return post.title.toLowerCase().indexOf(q) >= 0;
+			});
+		}
+
+		posts.sort(function (a,b) {
+			// sort desc.
+			return (a.date > b.date) ? -1 : (a.date < b.date) ? 1 : 0;
+		});
+		$scope.posts = posts;
+	};
+	$scope.filter();
+}
+
+testApp.controller("Whatever", ["$scope", Whatever]);
+
+</script>
+</body>
+</html>
